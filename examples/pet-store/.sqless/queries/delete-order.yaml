@@ -1,0 +1,4 @@
+- template: >-
+    DELETE FROM "order" where id = $1
+  params:
+    - params.orderId

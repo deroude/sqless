@@ -1,0 +1,47 @@
+div {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.tree-invisible {
+    display: none;
+}
+
+mat-card {
+    max-height: 15rem;
+    overflow: auto;
+}
+
+mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    position: relative;
+    bottom: -0.25rem;
+}
+
+mat-tree {
+    display: flex;
+    flex-direction: column;
+}
+
+mat-tree-node {
+    min-height: 24px;
+
+    &.leaf {
+        padding-left: 1.15rem;
+        cursor: pointer;
+    }
+
+    &.disabled {
+        opacity: .5;
+    }
+
+    &.selected {
+        background-color: lightblue;
+    }
+}

@@ -1,0 +1,36 @@
+mat-progress-bar {
+    position: fixed;
+    top: 0;
+}
+
+mat-horizontal-stepper {
+    margin-top: 10rem;
+    width: 50rem;
+    margin-left: auto;
+    margin-right: auto;
+
+    button {
+        margin-top: 2rem;
+        margin-right: 1rem;
+
+        &.github-login {
+            width: 6rem;
+            height: 6rem;
+            background-image: url('/assets/GitHub-Mark-Light-120px-plus.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 90%;
+            margin-left: 2rem;
+        }
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+ngx-monaco-editor {
+    width:100%;
+    height:25rem;
+}

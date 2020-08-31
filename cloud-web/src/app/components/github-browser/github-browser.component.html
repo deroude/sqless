@@ -1,0 +1,21 @@
+<mat-card>
+    <mat-tree [treeControl]="treeControl" [dataSource]="treeDataSource">
+        <!-- This is the tree node template for leaf nodes -->
+        <mat-tree-node class="leaf" *matTreeNodeDef="let node" matTreeNodeToggle
+            [class.disabled]="!selectableNode(node)" [class.primary-color]="selectableNode(node)"
+            [class.selected-background]="selectedFile?.path === node.path" (click)="select(node)">
+            {{node.name}}
+        </mat-tree-node>
+        <!-- This is the tree node template for expandable nodes -->
+        <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+            <mat-icon matTreeNodeToggle [attr.aria-label]="'toggle ' + node.name">
+                {{treeControl.isExpanded(node) ? 'folder' : 'folder_open'}}
+            </mat-icon>
+            {{node.name}}
+
+            <div [class.tree-invisible]="!treeControl.isExpanded(node)">
+                <ng-container matTreeNodeOutlet></ng-container>
+            </div>
+        </mat-nested-tree-node>
+    </mat-tree>
+</mat-card>

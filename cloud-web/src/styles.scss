@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import '~@angular/material/theming';
+// always include only once per project
+// import our custom theme
+@import 'theme.scss';
+
+// specify theme class eg: <body class="my-theme"> ... </body>
+.sqless-theme {
+    // use our theme with angular-material-theme mixin
+    @include angular-material-theme($sqless-theme);
+}
+
+.primary-color {
+    color: mat-color($sqless-primary) !important;
+}
+
+.selected-background {
+    background-color: mat-color($sqless-primary-bg) !important;
+}

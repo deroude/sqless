@@ -1,0 +1,5 @@
+- template:
+    SELECT * FROM pet WHERE status = ANY($1)
+  params:
+    - query.status
+  return: true

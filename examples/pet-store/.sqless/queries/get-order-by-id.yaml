@@ -1,0 +1,5 @@
+- template: >-
+    SELECT * FROM "order" where id = $1
+  params:
+    - params.orderId
+  return: true

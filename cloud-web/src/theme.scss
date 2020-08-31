@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+
+@import '~@angular/material/theming';
+
+$sqless-typography: mat-typography-config($font-family: '"Ubuntu", sans-serif;');
+
+@include mat-core($sqless-typography);
+// define 3 theme color
+// mat-palette accepts $palette-name, main, lighter and darker variants
+$sqless-primary: mat-palette($mat-indigo, 800);
+$sqless-primary-bg: mat-palette($mat-indigo, 50);
+$sqless-accent: mat-palette($mat-amber, 800);
+$sqless-warn: mat-palette($mat-deep-orange, 700);
+
+// create theme (use mat-dark-theme for themes with dark backgrounds)
+$sqless-theme: mat-light-theme($sqless-primary,
+    $sqless-accent,
+    $sqless-warn);

@@ -1,0 +1,69 @@
+version: 0.0.1
+dbConnection: 
+  type: postgres
+  database: postgres
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+migrations: 
+  - id: 001_initial
+    applyPath: migrations/001_initial.sql
+    rollbackPath: migrations/001_initial_rollback.sql
+apiPath: ../pet-store-api.yaml
+
+delegates:
+  /pet:
+    put:
+      type: sql
+      path: queries/update-pet.yaml
+    post:
+      type: sql
+      path: queries/add-pet.yaml
+  /pet/findByStatus:
+    get:
+      type: sql
+      path: queries/find-by-status.yaml
+  /pet/findByTags:
+    get:
+      type: sql
+      path: queries/find-by-tags.yaml
+  /pet/{petId}:
+    get:
+      type: sql
+      path: queries/find-by-id.yaml
+    post:
+      type: sql
+      path: queries/update-pet-with-form.yaml
+    delete:
+      type: sql
+      path: queries/delete-pet.yaml
+  /store/inventory:
+    get:
+      type: sql
+      path: queries/get-inventory.yaml
+  /store/order:
+    post:
+      type: sql
+      path: queries/place-order.yaml
+  /store/order/{orderId}:
+    post:
+      type: sql
+      path: queries/get-order-by-id.yaml
+    delete:
+      type: sql
+      path: queries/delete-order.yaml
+  /user:
+    post:
+      type: sql
+      path: queries/create-user.yaml
+  /user/{username}:
+    get:
+      type: sql
+      path: queries/get-user-by-name.yaml
+    put:
+      type: sql
+      path: queries/update-user.yaml
+    delete:
+      type: sql
+      path: queries/delete-user.yaml

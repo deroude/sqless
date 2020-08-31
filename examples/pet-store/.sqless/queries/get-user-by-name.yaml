@@ -1,0 +1,5 @@
+- template: >-
+    SELECT * FROM "user" where username = $1
+  params:
+    - params.username
+  return: true

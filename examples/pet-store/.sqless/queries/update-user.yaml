@@ -1,0 +1,20 @@
+- template: >-
+    UPDATE "user" SET 
+    username = $1, 
+    first_name = $2, 
+    last_name = $3, 
+    email = $4, 
+    "password" = crypt($5,gen_salt('bf')), 
+    phone = $6, 
+    user_status = $7
+    WHERE username = $8 RETURNING *
+  params:
+    - body.username
+    - body.firstName
+    - body.lastName 
+    - body.email
+    - body.password
+    - body.phone
+    - body.userStatus
+    - params.username
+  return: true

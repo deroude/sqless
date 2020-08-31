@@ -1,0 +1,59 @@
+{
+  "name": "@sqless/core",
+  "version": "0.0.1",
+  "description": "SQLess development platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rimraf dist/*",
+    "lint": "tslint -c tslint.json -p tsconfig.json --fix",
+    "tsc": "tsc",
+    "build": "npm run clean && npm run lint && npm run tsc",
+    "build:watch": "tsc -w",
+    "dev:start": "nodemon --watch dist --exec node .",
+    "dev": "concurrently \"npm run build:watch\" \"npm run dev:start\"",
+    "start": "node ."
+  },
+  "bin": {
+    "sqless": "bin/start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deroude/sqless.git"
+  },
+  "keywords": [
+    "serverless",
+    "sql",
+    "frontend",
+    "web"
+  ],
+  "author": "Valentin Raduti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deroude/sqless/issues"
+  },
+  "homepage": "https://github.com/deroude/sqless#readme",
+  "dependencies": {
+    "yargs": "^15.4.1",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "lodash": "^4.17.20",
+    "openapi3-ts": "^1.4.0",
+    "pg": "^8.3.0",
+    "swagger-ui-express": "^4.1.4",
+    "js-yaml": "3.14.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^3.12.5",
+    "@types/yargs": "11.0.0",
+    "@types/express": "^4.17.7",
+    "@types/lodash": "^4.14.159",
+    "@types/node": "^14.0.27",
+    "@types/pg": "^7.14.4",
+    "@types/swagger-ui-express": "^4.1.2",
+    "concurrently": "^5.2.0",
+    "nodemon": "^2.0.4",
+    "rimraf": "^3.0.2",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.7"
+  }
+}

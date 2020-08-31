@@ -1,0 +1,10 @@
+- template: >-
+    INSERT INTO "order" ( pet_id, quantity, ship_date, status, complete)
+    VALUES ($1,$2,$3,$4,$5) RETURNING *
+  params:
+    - body.petId
+    - body.quantity
+    - body.shipDate 
+    - body.status
+    - body.complete         
+  return: true 

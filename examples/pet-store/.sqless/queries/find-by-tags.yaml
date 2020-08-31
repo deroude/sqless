@@ -1,0 +1,7 @@
+- template: >-
+    SELECT p.* FROM pet p 
+    JOIN tag t ON p.tag=t.id         
+    WHERE t.name = ANY ($1)
+  params:
+    - params.tags
+  return: true

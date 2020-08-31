@@ -1,0 +1,44 @@
+<mat-progress-bar *ngIf="loading$|async"></mat-progress-bar>
+<mat-horizontal-stepper #stepper>
+  <mat-step>
+    <ng-template matStepLabel>Sign in with GitHub</ng-template>
+    <div *ngIf="!(user$|async); else logoutDisplay">
+      <button class="github-login" mat-fab color="primary" aria-label="Login with GitHub" (click)="login()">
+      </button>
+    </div>
+    <ng-template #logoutDisplay>
+      <p>You are logged in as <strong>{{(user$|async)?.email}}</strong></p>
+      <div>
+        <button mat-flat-button color="primary" (click)="logout()">Logout</button>
+        <button mat-flat-button color="primary" matStepperNext>Next</button>
+      </div>
+    </ng-template>
+  </mat-step>
+  <mat-step>
+    <h2>Select a file from your repo</h2>
+    <form>
+      <ng-template matStepLabel>Select your OpenAPI spec</ng-template>
+      <mat-form-field>
+        <mat-label>Repository</mat-label>
+        <mat-select [(value)]="selectedRepo">
+          <mat-option *ngFor="let repo of repos" [value]="repo">{{repo.full_name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <sqless-github-browser *ngIf="!!selectedRepo" [repo]="selectedRepo" (fileChange)="selectedFile=$event;loadSpec()">
+      </sqless-github-browser>
+    </form>
+    <h2>... or edit inline</h2>
+    <ngx-monaco-editor [options]="editorOptions" [(ngModel)]="code"></ngx-monaco-editor>
+    <div>
+      <button mat-flat-button color="primary" matStepperNext [disabled]="!nextActive" (click)="save()">Next</button>
+    </div>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Done</ng-template>
+    <p>Setting up your API ...</p>
+    <p *ngIf="completed">Done! Here's your <a [href]="swaggerUrl" target="_blank">OpenAPI docs page</a></p>
+    <div>
+      <button mat-flat-button color="primary" (click)="stepper.reset()">Reset</button>
+    </div>
+  </mat-step>
+</mat-horizontal-stepper>
