@@ -4,10 +4,11 @@
   "description": "SQLess development platform",
   "main": "dist/index.js",
   "scripts": {
-    "clean": "rimraf dist/*",
+    "prebuild": "rimraf dist/*",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "tsc": "tsc",
-    "build": "npm run clean && npm run lint && npm run tsc",
+    "build": "npm run lint && npm run tsc",
+    "postbuild": "cpy **/* !**/*.ts ../dist/ --cwd=src/ --no-overwrite --parents",
     "build:watch": "tsc -w",
     "dev:start": "nodemon --watch dist --exec node .",
     "dev": "concurrently \"npm run build:watch\" \"npm run dev:start\"",
@@ -40,7 +41,8 @@
     "openapi3-ts": "^1.4.0",
     "pg": "^8.3.0",
     "swagger-ui-express": "^4.1.4",
-    "js-yaml": "3.14.0"
+    "js-yaml": "3.14.0",
+    "handlebars": "^4.7.6"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.5",
@@ -50,8 +52,10 @@
     "@types/node": "^14.0.27",
     "@types/pg": "^7.14.4",
     "@types/swagger-ui-express": "^4.1.2",
+    "@types/handlebars": "^4.1.0",
     "concurrently": "^5.2.0",
     "nodemon": "^2.0.4",
+    "cpy-cli": "^3.1.1",
     "rimraf": "^3.0.2",
     "tslint": "^6.1.2",
     "typescript": "^3.9.7"
