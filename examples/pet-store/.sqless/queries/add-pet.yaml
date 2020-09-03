@@ -1,20 +1,22 @@
-- template: >-
-    INSERT INTO pet ( category, name, photo_urls, status)
-    VALUES ($1,$2,$3,$4) RETURNING *
-  params:
-    - body.category.id
-    - body.name
-    - body.photoUrls
-    - body.status
-  assign:
-    column: id
-    var: newId
-  return: true
-- template: >-
-    INSERT INTO pet_tag (pet,tag) VALUES ($1,$2)
-  params:
-    - newId
-    - tag
-  foreach:
-    var: tag
-    of: body.tags
+operations:
+  - template: >-
+      INSERT INTO pet ( category, name, photo_urls, status)
+      VALUES ($1,$2,$3,$4) RETURNING *
+    params:
+      - body.category.id
+      - body.name
+      - body.photoUrls
+      - body.status
+    singleRow: true
+    assign:
+      column: id
+      var: newId
+    return: true
+  - template: >-
+      INSERT INTO pet_tag (pet,tag) VALUES ($1,$2)
+    params:
+      - newId
+      - tag
+    forEach:
+      var: tag
+      of: body.tags

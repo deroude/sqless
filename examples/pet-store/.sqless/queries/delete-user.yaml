@@ -1,4 +1,5 @@
-- template: >-
-    DELETE FROM "user" where username = $1
-  params:
-    - params.username
+operations:
+  - template: >-
+      DELETE FROM "user" where username = $1
+    params:
+      - params.username

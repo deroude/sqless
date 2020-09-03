@@ -1,26 +1,27 @@
-- template: >- 
-    UPDATE pet SET 
-    category = $1,
-    name = $2,
-    photo_urls = $3,
-    status = $4
-    WHERE id = $5 RETURNING *;
-  params:
-    - body.category.id
-    - body.name
-    - body.photoUrls
-    - body.status
-    - params.petId
-  return: true
-- template:
-    DELETE FROM pet_tag WHERE pet = $1;
-  params:
-    - params.petId
-- template: >-            
-    INSERT INTO pet_tag (pet,tag) VALUES ($1,$2)
-  params:
-    - params.petId
-    - tag
-  foreach:
-    var: tag
-    of: body.tags
+operations:
+  - template: >- 
+      UPDATE pet SET 
+      category = $1,
+      name = $2,
+      photo_urls = $3,
+      status = $4
+      WHERE id = $5 RETURNING *;
+    params:
+      - body.category.id
+      - body.name
+      - body.photoUrls
+      - body.status
+      - params.petId
+    return: true
+  - template:
+      DELETE FROM pet_tag WHERE pet = $1;
+    params:
+      - params.petId
+  - template: >-            
+      INSERT INTO pet_tag (pet,tag) VALUES ($1,$2)
+    params:
+      - params.petId
+      - tag
+    forEach:
+      var: tag
+      of: body.tags

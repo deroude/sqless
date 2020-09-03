@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\core\\src\\index.ts",
-            "args": ["-c","examples/pet-store/.sqless/sqless-config.yaml"],
+            "args": ["start","-c","examples/pet-store/.sqless/sqless-config.yaml"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]

@@ -1,5 +1,6 @@
-- template: >-
-    SELECT * from pet WHERE id = $1
-  params: 
-    - params.petId
-  return: true
+operations:
+  - template: >-
+      SELECT * from pet WHERE id = $1
+    params: 
+      - params.petId
+    return: true

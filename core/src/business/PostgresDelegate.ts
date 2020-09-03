@@ -11,6 +11,7 @@ export class PostgresDelegate implements DelegateMethodExecutor {
         let re = null;
         const ctx = params;
         try {
+            await queryExecutor.executeQuery('START');
             for (const op of this.config.operations)
                 if (op.forEach) {
                     const loopCtx = ctx;
@@ -19,14 +20,20 @@ export class PostgresDelegate implements DelegateMethodExecutor {
                         loopCtx[op.forEach.var] = item;
                         const q = await this.executeQuery(queryExecutor, op, loopCtx);
                         if (!!op.return) re = q;
-                        if (!!op.setVar) loopCtx[op.setVar] = q;
+                        if (!!op.assign && !!op.singleRow) loopCtx[op.assign.var] = q[op.assign.column];
                     }
                 } else {
                     const q = await this.executeQuery(queryExecutor, op, ctx);
                     if (!!op.return) re = q;
-                    if (!!op.setVar) ctx[op.setVar] = q;
+                    if (!!op.assign) ctx[op.assign.var] = q[op.assign.column];
                 }
+            await queryExecutor.executeQuery('COMMIT');
         } catch (err) {
+            try {
+                await queryExecutor.executeQuery('ROLLBACK');
+            } catch (rbErr) {
+                console.error(rbErr);
+            }
             return Promise.reject(err);
         }
         return Promise.resolve(re);

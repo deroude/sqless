@@ -38,13 +38,14 @@ export class SQLess {
                 const f = this.expressRequest(method, `${basePath}${formattedPath}`, async (aReq, aRes) => {
                     try {
                         const context: any = { ...aReq };
-                        if (delegates[apiPath] && delegates[apiPath].get) {
-                            const delegate: DelegateMethodExecutor = delegates[apiPath].get;
+                        if (delegates[apiPath] && delegates[apiPath][method]) {
+                            const delegate: DelegateMethodExecutor = delegates[apiPath][method];
                             aRes.send(await delegate.execute(context, this.persistence));
                         } else {
                             aRes.status(501).send('Method not yet implemented');
                         }
                     } catch (err) {
+                        console.error(err);
                         aRes.status(500).send(err);
                     }
                 });

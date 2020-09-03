@@ -5,21 +5,22 @@ import * as yaml from 'js-yaml';
 import { Template } from "./templates/Template";
 import { Renderer } from "./templates/Renderer";
 import SQLessConfigTemplate from './templates/SQLessConfigTemplate';
+import { GeneratorConfig } from "../model/GeneratorConfig";
 
 export class Generator {
-    constructor(private apiPath: string) { }
+    constructor(private config: GeneratorConfig) { }
 
     async init(): Promise<void> {
         let api: OpenAPIObject;
 
-        if (this.apiPath) {
-            console.log(`Loading API from ${this.apiPath}`);
-            if (fs.existsSync(this.apiPath)) {
+        if (this.config.apiPath) {
+            console.log(`Loading API from ${this.config.apiPath}`);
+            if (fs.existsSync(this.config.apiPath)) {
                 try {
-                    api = yaml.safeLoad(fs.readFileSync(this.apiPath, 'utf-8')) as OpenAPIObject;
+                    api = yaml.safeLoad(fs.readFileSync(this.config.apiPath, 'utf-8')) as OpenAPIObject;
                     console.log('API file loaded');
                 } catch (err) {
-                    console.error(`Unable to load API file [${this.apiPath}]`);
+                    console.error(`Unable to load API file [${this.config.apiPath}]`);
                     console.error(err);
                     return Promise.reject(err);
                 }
@@ -31,7 +32,7 @@ export class Generator {
             return Promise.reject('No API file available');
         }
 
-        this.writeFile(SQLessConfigTemplate, { apiPath: this.apiPath });
+        this.writeFile(SQLessConfigTemplate, { apiPath: this.config.apiPath });
 
         return Promise.resolve();
     }

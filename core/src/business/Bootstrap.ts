@@ -11,6 +11,7 @@ import { QueryExecutor } from '../model/QueryExecutor';
 import { DelegateMethodExecutor } from '../model/Delegate';
 import { QueryDelegateConfig } from '../model/QueryDelegateConfig';
 import { PostgresDelegate } from './PostgresDelegate';
+import { DefaultPostgresRestDelegate } from './DefaultPostgresRestDelegate';
 
 export class Bootstrap {
     constructor(private argv: BootstrapConfig) { }
@@ -115,6 +116,13 @@ export class Bootstrap {
                                 console.error(err);
                             }
                             break;
+                        default:
+                            try {
+                                delegates[dPath][dMethod] = new DefaultPostgresRestDelegate(dPath, dMethod);
+                            } catch (err) {
+                                console.warn(`Unable to construct default delegate for ${dPath} | ${dMethod}`);
+                                console.error(err);
+                            }
                         // TODO add function delegates
                     }
                 });

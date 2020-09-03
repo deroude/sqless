@@ -1,3 +1,4 @@
-- template: >-
-    SELECT status,count(id) FROM pet GROUP BY status;
-  return: true
+operations:
+  - template: >-
+      SELECT status,count(id) FROM pet GROUP BY status;
+    return: true
