@@ -3,7 +3,6 @@ import fs, { promises } from 'fs';
 import path from 'path';
 import { DEFAULT_CONFIG, Config } from '../model/Config';
 import * as yaml from 'js-yaml';
-import { OpenAPIObject } from 'openapi3-ts';
 import { PostgresQueryExecutor } from './PostgresQueryExecutor';
 import { Pool } from 'pg';
 import { SQLess } from './SQLess';
@@ -12,6 +11,7 @@ import { DelegateMethodExecutor } from '../model/Delegate';
 import { QueryDelegateConfig } from '../model/QueryDelegateConfig';
 import { PostgresDelegate } from './PostgresDelegate';
 import { DefaultPostgresRestDelegate } from './DefaultPostgresRestDelegate';
+import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 
 export class Bootstrap {
     constructor(private argv: BootstrapConfig) { }
@@ -40,14 +40,14 @@ export class Bootstrap {
             config.apiPath = this.argv.apiPath;
         }
 
-        let api: OpenAPIObject;
+        let api: OpenAPIV3.Document;
 
         if (config.apiPath) {
             const apiPath = path.resolve(configCwd, config.apiPath);
             console.log(`Loading API from ${apiPath}`);
             if (fs.existsSync(apiPath)) {
                 try {
-                    api = yaml.safeLoad(fs.readFileSync(apiPath, 'utf-8')) as OpenAPIObject;
+                    api = yaml.safeLoad(fs.readFileSync(apiPath, 'utf-8')) as OpenAPIV3.Document;
                     console.log('API file loaded');
                 } catch (err) {
                     console.error(`Unable to load API file [${apiPath}]`);
@@ -134,7 +134,7 @@ export class Bootstrap {
 
         server.start(this.argv.hostname, this.argv.port);
 
-        server.addAPI(null, api, delegates);
+        await server.addAPI(null, api, delegates);
         console.log("API ready");
         return Promise.resolve();
     }

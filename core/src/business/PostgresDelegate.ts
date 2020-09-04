@@ -11,7 +11,7 @@ export class PostgresDelegate implements DelegateMethodExecutor {
         let re = null;
         const ctx = params;
         try {
-            await queryExecutor.executeQuery('START');
+            await queryExecutor.executeQuery('BEGIN');
             for (const op of this.config.operations)
                 if (op.forEach) {
                     const loopCtx = ctx;

@@ -4,6 +4,8 @@ import swaggerUi from 'swagger-ui-express';
 import { OpenAPIObject } from 'openapi3-ts';
 import { DelegateMethodExecutor } from '../model/Delegate';
 import { QueryExecutor } from '../model/QueryExecutor';
+import { OpenApiValidator } from 'express-openapi-validator';
+import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 
 export class SQLess {
 
@@ -24,7 +26,7 @@ export class SQLess {
         });
     }
 
-    addAPI(tenant: string, api: OpenAPIObject, delegates: { [path: string]: { [method: string]: DelegateMethodExecutor } }): void {
+    async addAPI(tenant: string, api: OpenAPIV3.Document, delegates: { [path: string]: { [method: string]: DelegateMethodExecutor } }): Promise<void> {
         console.log(`Adding API for ${tenant || 'local environment'} ... `);
         let basePath = '';
         if (tenant) {
@@ -35,6 +37,9 @@ export class SQLess {
         for (const [apiPath, item] of Object.entries(api.paths)) {
             const formattedPath = apiPath.replace(/\{(.+)\}/g, ':$1');
             for (const method of Object.keys(item)) {
+                await new OpenApiValidator({
+                    apiSpec: api
+                }).install(this.app);
                 const f = this.expressRequest(method, `${basePath}${formattedPath}`, async (aReq, aRes) => {
                     try {
                         const context: any = { ...aReq };
@@ -51,6 +56,7 @@ export class SQLess {
                 });
             }
         }
+        return Promise.resolve();
     }
 
     // TODO write a better impl
