@@ -3,33 +3,35 @@ import { QueryExecutor } from '../model/QueryExecutor';
 import { PostgresDelegate } from './PostgresDelegate';
 import { QueryDelegateConfig } from '../model/QueryDelegateConfig';
 
-const BY_ID = /^\/([^\s\/\?\\]+)\/\{([^\s\/\?\\])\}$/g;
-const ALL = /^\/([^\s\/\?\\]+)$/g;
+const BY_ID = /^\/([^\s\/\?\\]+)\/\{([^\s\/\?\\]+)\}$/;
+const ALL = /^\/([^\s\/\?\\]+)$/;
 
 export const RestMapper: (path: string, method: string) => QueryDelegateConfig = (path, method) => {
+    let parts;
     switch (method.toLowerCase()) {
         case 'get':
-            if (ALL.test(path)) {
+            parts = path.match(ALL);
+            if (parts) {
                 return {
                     operations: [
-                        { template: `SELECT * FROM "${ALL.exec(path)[1]}";` }
+                        { template: `SELECT * FROM "${parts[1]}";`, return: true }
                     ]
                 }
             }
-            if (BY_ID.test(path)) {
-                const parts = BY_ID.exec(path);
+            parts = path.match(BY_ID);
+            if (parts) {
                 return {
                     operations: [
-                        { template: `SELECT * FROM "${parts[1]}" WHERE ${parts[2]}=$1";`, params: [`params.${parts[2]}`] }
+                        { template: `SELECT * FROM "${parts[1]}" WHERE ${parts[2]}=$1;`, params: [`params.${parts[2]}`], return: true }
                     ]
                 }
             }
         case 'delete':
-            if (BY_ID.test(path)) {
-                const parts = BY_ID.exec(path);
+            parts = path.match(BY_ID)
+            if (parts) {
                 return {
                     operations: [
-                        { template: `DELETE FROM "${parts[1]}" WHERE ${parts[2]}=$1";`, params: [`params.${parts[2]}`] }
+                        { template: `DELETE FROM "${parts[1]}" WHERE ${parts[2]}=$1;`, params: [`params.${parts[2]}`]}
                     ]
                 }
             }

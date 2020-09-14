@@ -70,14 +70,19 @@ export class SQLess {
         switch (method.toLowerCase()) {
             case 'get':
                 this.app.get(path, handler);
+                break;
             case 'post':
                 this.app.post(path, handler);
+                break;
             case 'delete':
                 this.app.delete(path, handler);
+                break;
             case 'put':
                 this.app.put(path, handler);
+                break;
             case 'patch':
                 this.app.patch(path, handler);
+                break;
         }
     }
 }

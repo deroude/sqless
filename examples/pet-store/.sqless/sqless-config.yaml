@@ -29,9 +29,6 @@ delegates:
       type: sql
       path: queries/find-by-tags.yaml
   /pet/{petId}:
-    get:
-      type: sql
-      path: queries/find-by-id.yaml
     post:
       type: sql
       path: queries/update-pet-with-form.yaml

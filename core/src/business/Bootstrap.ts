@@ -130,6 +130,21 @@ export class Bootstrap {
                     }
                 });
             });
+
+            // Fill non-delegated paths with defaults
+            for (const [apiPath, item] of Object.entries(config.api.paths)) {
+                for (const method of Object.keys(item)) {
+                    if (config.delegates[apiPath] === undefined) config.delegates[apiPath] = {};
+                    if (config.delegates[apiPath][method] === undefined) {
+                        console.log(`- [default] ${method.toUpperCase()} ${apiPath}`)
+                        try {
+                            config.delegates[apiPath][method] = new DefaultPostgresRestDelegate(apiPath, method);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+                }
+            }
             console.log('Done');
         }
 
