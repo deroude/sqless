@@ -1,6 +1,6 @@
 operations:
   - template:
-      SELECT * FROM pet WHERE status = $1
+      SELECT * FROM pet WHERE status = ANY ($1)
     params:
       - query.status
     return: true

@@ -206,7 +206,8 @@ paths:
           description: Pet not found
           content: {}
       security:
-        - api_key: []
+        - petstore_auth:
+            - 'read:pets'
     post:
       tags:
         - pet

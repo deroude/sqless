@@ -10,7 +10,7 @@ migrations:
   - id: 001_initial
     applyPath: migrations/001_initial.sql
     rollbackPath: migrations/001_initial_rollback.sql
-apiPath: ../pet-store-api.yaml
+api: ../pet-store-api.yaml
 
 delegates:
   /pet:

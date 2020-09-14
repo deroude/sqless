@@ -33,13 +33,13 @@ export class SQLess {
         }
         if (isFullApi(config.api)) {
             config.api.servers = [{ url: `${basePath}` }]
+            await new OpenApiValidator({
+                apiSpec: config.api
+            }).install(this.app);
             this.app.use(`${basePath}/api-docs`, swaggerUi.serve, swaggerUi.setup(config.api));
             for (const [apiPath, item] of Object.entries(config.api.paths)) {
                 const formattedPath = apiPath.replace(/\{(.+)\}/g, ':$1');
                 for (const method of Object.keys(item)) {
-                    await new OpenApiValidator({
-                        apiSpec: config.api
-                    }).install(this.app);
                     const f = this.expressRequest(method, `${basePath}${formattedPath}`, async (aReq, aRes) => {
                         try {
                             const context: any = { ...aReq };
