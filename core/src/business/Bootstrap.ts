@@ -7,6 +7,7 @@ import { PostgresQueryExecutor } from './PostgresQueryExecutor';
 import { Pool } from 'pg';
 import { SQLess } from './SQLess';
 import { QueryExecutor } from '../model/QueryExecutor';
+import { DelegateConfig, isConfig } from '../model/Delegate';
 import { DelegateMethodExecutor } from '../model/Delegate';
 import { QueryDelegateConfig } from '../model/QueryDelegateConfig';
 import { PostgresDelegate } from './PostgresDelegate';
@@ -37,13 +38,13 @@ export class Bootstrap {
         }
 
         if (this.argv.apiPath) {
-            config.apiPath = this.argv.apiPath;
+            config.api = this.argv.apiPath;
         }
 
         let api: OpenAPIV3.Document;
 
-        if (config.apiPath) {
-            const apiPath = path.resolve(configCwd, config.apiPath);
+        if (config.api && typeof config.api === 'string') {
+            const apiPath = path.resolve(configCwd, config.api);
             console.log(`Loading API from ${apiPath}`);
             if (fs.existsSync(apiPath)) {
                 try {
@@ -61,6 +62,8 @@ export class Bootstrap {
             console.error(`No API file available`);
             Promise.reject('No API file available');
         }
+
+        config.api = api;
 
         let persistence: QueryExecutor;
 
@@ -94,36 +97,36 @@ export class Bootstrap {
             console.log('Migrations finished.');
         }
 
-        const delegates: { [path: string]: { [method: string]: DelegateMethodExecutor } } = {};
 
         if (config.delegates) {
             console.log('Attaching API delegates...');
             Object.keys(config.delegates).forEach(dPath => {
-                delegates[dPath] = {};
                 Object.keys(config.delegates[dPath]).forEach(dMethod => {
                     const delegateConfig = config.delegates[dPath][dMethod];
                     console.log(`- ${dMethod.toUpperCase()} ${dPath}`)
-                    switch (delegateConfig.type) {
-                        case 'sql':
-                            try {
-                                const sqlConfig: QueryDelegateConfig = yaml.safeLoad(
-                                    fs.readFileSync(
-                                        path.resolve(configCwd, delegateConfig.path), 'utf-8')
-                                ) as QueryDelegateConfig;
-                                delegates[dPath][dMethod] = new PostgresDelegate(sqlConfig);
-                            } catch (err) {
-                                console.warn(`Unable to load delegate for ${dPath} | ${dMethod}`);
-                                console.error(err);
-                            }
-                            break;
-                        default:
-                            try {
-                                delegates[dPath][dMethod] = new DefaultPostgresRestDelegate(dPath, dMethod);
-                            } catch (err) {
-                                console.warn(`Unable to construct default delegate for ${dPath} | ${dMethod}`);
-                                console.error(err);
-                            }
-                        // TODO add function delegates
+                    if (isConfig(delegateConfig)) {
+                        switch (delegateConfig.type) {
+                            case 'sql':
+                                try {
+                                    const sqlConfig: QueryDelegateConfig = yaml.safeLoad(
+                                        fs.readFileSync(
+                                            path.resolve(configCwd, delegateConfig.path), 'utf-8')
+                                    ) as QueryDelegateConfig;
+                                    config.delegates[dPath][dMethod] = new PostgresDelegate(sqlConfig);
+                                } catch (err) {
+                                    console.warn(`Unable to load delegate for ${dPath} | ${dMethod}`);
+                                    console.error(err);
+                                }
+                                break;
+                            default:
+                                try {
+                                    config.delegates[dPath][dMethod] = new DefaultPostgresRestDelegate(dPath, dMethod);
+                                } catch (err) {
+                                    console.warn(`Unable to construct default delegate for ${dPath} | ${dMethod}`);
+                                    console.error(err);
+                                }
+                            // TODO add function delegates
+                        }
                     }
                 });
             });
@@ -134,7 +137,7 @@ export class Bootstrap {
 
         server.start(this.argv.hostname, this.argv.port);
 
-        await server.addAPI(null, api, delegates);
+        await server.addAPI(null, config);
         console.log("API ready");
         return Promise.resolve();
     }
