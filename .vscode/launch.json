@@ -4,15 +4,29 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Start",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\core\\src\\index.ts",
             "args": ["start","-c","examples/pet-store/.sqless/sqless-config.yaml"],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Init",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\core\\src\\index.ts",
+            "args": ["init","-a","examples/pet-store/pet-store-api.yaml"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
