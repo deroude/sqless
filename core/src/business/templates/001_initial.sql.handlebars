@@ -1,0 +1,11 @@
+{{#each entities ~}}
+CREATE TABLE "{{name}}" (
+{{#each properties}}
+    {{#if isId }}"{{name}}" serial NOT NULL PRIMARY KEY 
+    {{~else}}"{{name}}" {{type}} {{~#if isRequired}}NOT NULL{{/if~}}
+{{~/if~}}
+{{~#unless @last}},{{/unless}}
+{{/each}}
+);
+
+{{/each}}
