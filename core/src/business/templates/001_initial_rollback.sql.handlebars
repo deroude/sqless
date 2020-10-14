@@ -1,0 +1,3 @@
+{{#each entities ~}}
+DELETE TABLE IF EXISTS "{{name}}" CASCADE;
+{{/each}}

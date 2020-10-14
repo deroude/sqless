@@ -16,6 +16,7 @@ interface Property {
     type: PGType,
     isId: boolean;
     isRequired: boolean;
+    fk?: string;
 }
 
 interface Entity {
@@ -37,7 +38,13 @@ const typeMap: { [k: string]: PGType } = {
     'boolean': 'boolean'
 }
 
-const toSnake = (a: string) => a.split(/(?=[A-Z])/).join('_').toLowerCase();
+function toSnake(a: string) { return a.split(/(?=[A-Z])/).join('_').toLowerCase(); }
+
+function isReference(prop: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject): prop is OpenAPIV3.ReferenceObject {
+    return (prop as OpenAPIV3.ReferenceObject).$ref !== undefined;
+}
+
+const refPattern = /^#\/components\/schemas\/(.+)$/;
 
 export class Generator {
     constructor(private config: GeneratorConfig) { }
@@ -70,23 +77,60 @@ export class Generator {
             const entity: Entity = { name: toSnake(k), properties: [] };
             const schema: OpenAPIV3.SchemaObject = v as OpenAPIV3.SchemaObject;
             for (const [pk, pv] of Object.entries(schema.properties)) {
-                // TODO treat references
-                const ps: OpenAPIV3.SchemaObject = pv as OpenAPIV3.SchemaObject;
-                const property: Property = {
-                    name: toSnake(pk),
-                    isId: pk.toLowerCase() === 'id',
-                    isRequired: schema.required && schema.required.indexOf(pk.toLowerCase()) > 0,
-                    type: typeMap[ps.format ? `${ps.type}:${ps.format}` : ps.type]
+                if (isReference(pv)) {
+                    const ref = pv.$ref.match(refPattern);
+                    if (ref && ref[1]) {
+                        entity.properties.push({
+                            name: toSnake(pk),
+                            isId: false,
+                            isRequired: schema.required && schema.required.indexOf(pk.toLowerCase()) > 0,
+                            type: 'int',
+                            fk: toSnake(ref[1])
+                        });
+                    }
+                } else {
+                    entity.properties.push({
+                        name: toSnake(pk),
+                        isId: pk.toLowerCase() === 'id',
+                        isRequired: schema.required && schema.required.indexOf(pk.toLowerCase()) > 0,
+                        type: typeMap[pv.format ? `${pv.type}:${pv.format}` : pv.type]
+                    })
                 }
-                entity.properties.push(property);
             }
+
             entities.push(entity);
+        }
+
+        let iter = 0;
+        let sw = true;
+        while (sw && iter++ < 10) {
+            sw = false;
+            for (let i = 0; i < entities.length; i++) {
+                const e = entities[i];
+                for (const prop of e.properties) {
+                    if (prop.fk) {
+                        const si = entities.findIndex(o => o.name === prop.fk);
+                        if (si > i) {
+                            sw = true;
+                            const oe: Entity = entities[si];
+                            entities[si] = entities[i];
+                            entities[i] = oe;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(iter === 10){
+            console.warn('Circular FK detected');
         }
 
         await this.writeFile('.sqless/sqless-config.yaml', Handlebars.templates['sqless-config.yaml'], { apiPath: this.config.apiPath.replace(/^\.[\/\\]/, '') });
         await this.writeFile('.sqless/docker-compose.yaml', Handlebars.templates['docker-compose.yaml'], {});
         await this.writeFile('.sqless/postgres-init.sql', Handlebars.templates['postgres-init.sql'], {});
         await this.writeFile('.sqless/migrations/001_initial.sql', Handlebars.templates['001_initial.sql'], { entities });
+        await this.writeFile('.sqless/migrations/001_initial_rollback.sql', Handlebars.templates['001_initial_rollback.sql'], { entities: entities.reverse() });
 
 
         return Promise.resolve();
