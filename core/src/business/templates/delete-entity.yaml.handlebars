@@ -1,0 +1,5 @@
+operations:
+  - template: >-
+      DELETE FROM "{{title}}" where "id" = $1;
+    params:
+      - params.id

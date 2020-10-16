@@ -6,4 +6,17 @@ dbConnection:
     port: 5432
     user: postgres
     password: postgres
+migrations: 
+  - id: 001_initial
+    applyPath: migrations/001_initial.sql
+    rollbackPath: migrations/001_initial_rollback.sql
 api: ../{{ apiPath }}
+delegates:
+{{#each entities}}
+  /{{name}}:
+{{#each operations}}
+    {{method}}:
+      type: sql
+      path: {{delegate}}
+{{/each}}
+{{/each}}

@@ -1,0 +1,10 @@
+operations:
+  - template: >-
+      INSERT INTO "{{ title }}" ( 
+        {{#each properties}}{{#unless isId}}"{{ title }}"{{~#unless @last}},{{/unless}}{{/unless}}{{/each}} 
+      )
+      VALUES (${{#each properties}}{{#unless isId}}{{index}}{{~#unless @last}},{{/unless}}{{/unless}}{{/each}}) RETURNING *;
+    params:
+      {{#each properties}}{{#unless isId}}- body.{{ title }}{{#if fk}}.id{{/if}}{{/unless}}{{/each}}
+    singleRow: true
+    return: true

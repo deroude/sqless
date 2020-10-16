@@ -1,0 +1,9 @@
+operations:
+  - template: >-
+      UPDATE "{{ title }}" SET 
+      {{#each properties}}{{#unless isId}}"{{ title }}" = ${{index}} {{~#unless @last}},{{/unless}}{{/unless}}{{/each}}
+      WHERE id = ${{lastIndex}} RETURNING *
+    params:
+      {{#each properties}}{{#unless isId}}- body.{{ title }}{{#if fk}}.id{{/if}}{{/unless}}{{/each}}
+      - params.id
+    return: true  

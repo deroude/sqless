@@ -1,5 +1,5 @@
 operations:
   - template: >-
-      DELETE FROM "order" where id = $1
+      DELETE FROM "order" where id = $1;
     params:
       - params.orderId
