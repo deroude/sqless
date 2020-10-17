@@ -26,7 +26,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\core\\src\\index.ts",
-            "args": ["init","-a","examples/pet-store/pet-store-api.yaml"],
+            "args": ["init","-a","examples/cms/cms-crud-api.yaml"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]

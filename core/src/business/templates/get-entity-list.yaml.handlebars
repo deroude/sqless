@@ -1,0 +1,6 @@
+operations:
+  - template: >-
+      SELECT {{#each properties}}"{{ nameSnake }}"{{~#unless @last}},{{/unless}}{{/each}} 
+      FROM "{{ nameSnake }}" ;    
+    singleRow: false
+    return: true
