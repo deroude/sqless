@@ -1,6 +1,9 @@
 import { QueryExecutor } from '../model/QueryExecutor';
+import { MigrationExecutor } from '../model/MigrationExecutor';
+
 import { Pool } from 'pg';
 
+// TODO use template
 const INIT = `
 CREATE SCHEMA IF NOT EXISTS sqless;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA sqless;
@@ -25,7 +28,7 @@ CREATE TABLE IF NOT EXISTS sqless.migrations (
 );
 `;
 
-export class PostgresQueryExecutor implements QueryExecutor {
+export class PostgresQueryExecutor implements QueryExecutor, MigrationExecutor {
 
     ready = false;
 

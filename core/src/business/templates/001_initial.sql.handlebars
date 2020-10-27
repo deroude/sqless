@@ -1,8 +1,8 @@
 {{#each entities ~}}
-CREATE TABLE "{{name}}" (
+CREATE TABLE "{{nameSnake}}" (
 {{#each properties}}
-    {{#if isId }}"{{name}}" serial NOT NULL PRIMARY KEY 
-    {{~else}}"{{name}}" {{type}} 
+    {{#if isId }}"{{nameSnake}}" serial NOT NULL PRIMARY KEY 
+    {{~else}}"{{nameSnake}}" {{type}} 
         {{~#if isRequired}}NOT NULL{{/if~}} 
         {{~#if fk}} REFERENCES "{{fk}}"("id"){{/if~}} 
     {{~/if~}}

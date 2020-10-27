@@ -1,7 +1,6 @@
 import express, { Express } from 'express';
 import bodyParser from "body-parser";
 import swaggerUi from 'swagger-ui-express';
-import { isExecutor } from '../model/Delegate';
 import { QueryExecutor } from '../model/QueryExecutor';
 import { OpenApiValidator } from 'express-openapi-validator';
 import { Config, isFullApi } from '../model/Config';
@@ -43,13 +42,9 @@ export class SQLess {
                     const f = this.expressRequest(method, `${basePath}${formattedPath}`, async (aReq, aRes) => {
                         try {
                             const context: any = { ...aReq };
-                            if (config.delegates[apiPath] && config.delegates[apiPath][method]) {
-                                const delegate = config.delegates[apiPath][method];
-                                if (isExecutor(delegate)) {
-                                    aRes.send(await delegate.execute(context, this.persistence));
-                                } else {
-                                    aRes.status(501).send('Method not yet implemented');
-                                }
+                            if (config.delegateExecutors[apiPath] && config.delegateExecutors[apiPath][method]) {
+                                const delegate = config.delegateExecutors[apiPath][method];
+                                aRes.send(await delegate.execute(context, this.persistence));
                             } else {
                                 aRes.status(501).send('Method not yet implemented');
                             }

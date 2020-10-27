@@ -1,18 +1,17 @@
 import { BootstrapConfig } from '../model/BootstrapConfig';
-import fs, { promises } from 'fs';
+import fs from 'fs';
 import path from 'path';
 import { DEFAULT_CONFIG, Config } from '../model/Config';
 import * as yaml from 'js-yaml';
 import { PostgresQueryExecutor } from './PostgresQueryExecutor';
 import { Pool } from 'pg';
 import { SQLess } from './SQLess';
-import { QueryExecutor } from '../model/QueryExecutor';
-import { DelegateConfig, isConfig } from '../model/Delegate';
-import { DelegateMethodExecutor } from '../model/Delegate';
 import { QueryDelegateConfig } from '../model/QueryDelegateConfig';
 import { PostgresDelegate } from './PostgresDelegate';
-import { DefaultPostgresRestDelegate } from './DefaultPostgresRestDelegate';
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
+import { MigrationExecutor } from '../model/MigrationExecutor';
+import { NotImplementedDelegate } from './NotImplementedDelegate';
+import { QueryExecutor } from '../model/QueryExecutor';
 
 export class Bootstrap {
     constructor(private argv: BootstrapConfig) { }
@@ -65,7 +64,7 @@ export class Bootstrap {
 
         config.api = api;
 
-        let persistence: QueryExecutor;
+        let persistence: MigrationExecutor & QueryExecutor;
 
         if (config.dbConnection.type === 'postgres') {
             console.log('Initializing Postgres');
@@ -98,47 +97,30 @@ export class Bootstrap {
         }
 
 
-        if (config.delegates) {
+        if (config.delegatePaths) {
             console.log('Attaching API delegates...');
-            Object.keys(config.delegates).forEach(dPath => {
-                Object.keys(config.delegates[dPath]).forEach(dMethod => {
-                    const delegateConfig = config.delegates[dPath][dMethod];
+            Object.keys(config.delegatePaths).forEach(dPath => {
+                Object.keys(config.delegatePaths[dPath]).forEach(dMethod => {
+                    const delegateConfig = config.delegatePaths[dPath][dMethod];
                     console.log(`- ${dMethod.toUpperCase()} ${dPath}`)
-                    if (isConfig(delegateConfig)) {
-                        switch (delegateConfig.type) {
-                            case 'sql':
-                                try {
-                                    const sqlConfig: QueryDelegateConfig = yaml.safeLoad(
-                                        fs.readFileSync(
-                                            path.resolve(configCwd, delegateConfig.path), 'utf-8')
-                                    ) as QueryDelegateConfig;
-                                    config.delegates[dPath][dMethod] = new PostgresDelegate(sqlConfig);
-                                } catch (err) {
-                                    console.warn(`Unable to load delegate for ${dPath} | ${dMethod}`);
-                                    console.error(err);
-                                }
-                                break;
-                            default:
-                                try {
-                                    config.delegates[dPath][dMethod] = new DefaultPostgresRestDelegate(dPath, dMethod);
-                                } catch (err) {
-                                    console.warn(`Unable to construct default delegate for ${dPath} | ${dMethod}`);
-                                    console.error(err);
-                                }
-                            // TODO add function delegates
-                        }
-                    }
+                    const sqlConfig: QueryDelegateConfig = yaml.safeLoad(
+                        fs.readFileSync(
+                            path.resolve(configCwd, delegateConfig), 'utf-8')
+                    ) as QueryDelegateConfig;
+                    if (config.delegateExecutors[dPath] === undefined) config.delegateExecutors[dPath] = {};
+                    // TODO add mongo delegate
+                    config.delegateExecutors[dPath][dMethod] = new PostgresDelegate(sqlConfig);
                 });
             });
 
             // Fill non-delegated paths with defaults
             for (const [apiPath, item] of Object.entries(config.api.paths)) {
                 for (const method of Object.keys(item)) {
-                    if (config.delegates[apiPath] === undefined) config.delegates[apiPath] = {};
-                    if (config.delegates[apiPath][method] === undefined) {
+                    if (config.delegateExecutors[apiPath] === undefined) config.delegateExecutors[apiPath] = {};
+                    if (config.delegateExecutors[apiPath][method] === undefined) {
                         console.log(`- [default] ${method.toUpperCase()} ${apiPath}`)
                         try {
-                            config.delegates[apiPath][method] = new DefaultPostgresRestDelegate(apiPath, method);
+                            config.delegateExecutors[apiPath][method] = new NotImplementedDelegate();
                         } catch (err) {
                             console.error(err);
                         }

@@ -1,7 +1,7 @@
 import { PostgresConfig } from "./PostgresConfig";
 import { MongoConfig } from "./MongoConfig";
 import { Migration } from "./Migration";
-import { DelegateConfig, DelegateMethodExecutor } from "./Delegate";
+import { DelegateMethodExecutor } from "./Delegate";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 export interface Config {
@@ -9,7 +9,8 @@ export interface Config {
     dbConnection?: PostgresConfig | MongoConfig;
     migrations?: Migration[];
     api?: string | OpenAPIV3.Document;
-    delegates?: { [path: string]: { [method: string]: DelegateConfig | DelegateMethodExecutor } }
+    delegatePaths?: { [path: string]: { [method: string]: string } }
+    delegateExecutors?: { [path: string]: { [method: string]: DelegateMethodExecutor } }
 }
 
 export function isFullApi(api: string | OpenAPIV3.Document): api is OpenAPIV3.Document {
