@@ -2,7 +2,7 @@ import express, { Express } from 'express';
 import bodyParser from "body-parser";
 import swaggerUi from 'swagger-ui-express';
 import { QueryExecutor } from '../model/QueryExecutor';
-import { OpenApiValidator } from 'express-openapi-validator';
+import * as  OpenApiValidator from 'express-openapi-validator';
 import { Config, isFullApi } from '../model/Config';
 
 export class SQLess {
@@ -31,11 +31,18 @@ export class SQLess {
             basePath = `/tenants/${tenant}`;
         }
         if (isFullApi(config.api)) {
-            config.api.servers = [{ url: `${basePath}` }]
-            await new OpenApiValidator({
-                apiSpec: config.api
-            }).install(this.app);
+            config.api.servers = [{ url: `${basePath}` }];
             this.app.use(`${basePath}/api-docs`, swaggerUi.serve, swaggerUi.setup(config.api));
+            this.app.use(OpenApiValidator.middleware({
+                apiSpec: config.api
+            }));
+            this.app.use(async (err: any, req: any, res: any, next: any) => {
+                // format error
+                res.status(err.status || 500).json({
+                    message: err.message,
+                    errors: err.errors,
+                });
+            });
             for (const [apiPath, item] of Object.entries(config.api.paths)) {
                 const formattedPath = apiPath.replace(/\{(.+)\}/g, ':$1');
                 for (const method of Object.keys(item)) {
