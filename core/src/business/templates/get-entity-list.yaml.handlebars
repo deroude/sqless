@@ -1,6 +1,9 @@
 operations:
-  - template: >-
+  - id: GetList{{ name }}
+    template: >-
       SELECT {{#each properties}}"{{ nameSnake }}"{{~#unless @last}},{{/unless}}{{/each}} 
       FROM "{{ nameSnake }}" ;    
     singleRow: false
-    return: true
+    assign: 
+      var: List{{ name }}
+return: List{{ name }}

@@ -1,5 +1,7 @@
 operations:
-  - template: >-
+  - id: Add{{ name }}
+    type: sql
+    template: >-
       INSERT INTO "{{ nameSnake }}" ( 
         {{#each properties}}{{#unless isId}}"{{ nameSnake }}"{{~#unless @last}},{{/unless}}{{/unless}}{{/each}} 
       )
@@ -9,4 +11,6 @@ operations:
       {{#unless isId}}- body.{{ nameSnake }}{{#if fk}}.id{{/if}}{{/unless}}
       {{/each}}
     singleRow: true
-    return: true
+    assign: 
+      var: New{{ name }}
+return: New{{ name }}

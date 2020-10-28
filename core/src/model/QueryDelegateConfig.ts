@@ -13,7 +13,7 @@ export interface SQLOperationConfig extends OperationConfig {
     template: string;
     params?: string[];
     forEach?: { var: string, of: string };
-    assign?: { column: string, var: string };
+    assign?: { column?: string, var: string };
     singleRow?: boolean;
     singleField?: string;
 }

@@ -1,5 +1,7 @@
 operations:
-  - template: >-
+  - id: Delete{{ name }}
+    type: sql
+    template: >-
       DELETE FROM "{{nameSnake}}" where "id" = $1;
     params:
       - params.id

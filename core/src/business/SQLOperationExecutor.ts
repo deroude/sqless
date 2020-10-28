@@ -4,7 +4,7 @@ import _ from "lodash";
 
 export class SQLOperationExecutor implements OperationExecutor {
 
-    constructor(private config: SQLOperationConfig, private queryExecutor: QueryExecutor){}
+    constructor(private config: SQLOperationConfig, private queryExecutor: QueryExecutor) { }
 
     async execute(ctx: any): Promise<void> {
         if (this.config.forEach) {
@@ -13,11 +13,23 @@ export class SQLOperationExecutor implements OperationExecutor {
             for (const item of forEachOf) {
                 loopCtx[this.config.forEach.var] = item;
                 const q = await this.executeQuery(this.queryExecutor, loopCtx);
-                if (!!this.config.assign && !!this.config.singleRow) loopCtx[this.config.assign.var] = q[this.config.assign.column];
+                if (!!this.config.assign && !!this.config.singleRow) {
+                    if (!!this.config.assign.column) {
+                        loopCtx[this.config.assign.var] = q[this.config.assign.column];
+                    } else {
+                        loopCtx[this.config.assign.var] = q;
+                    }
+                }
             }
         } else {
             const q = await this.executeQuery(this.queryExecutor, ctx);
-            if (!!this.config.assign) ctx[this.config.assign.var] = q[this.config.assign.column];
+            if (!!this.config.assign) {
+                if (!!this.config.assign.column) {
+                    ctx[this.config.assign.var] = q[this.config.assign.column];
+                } else {
+                    ctx[this.config.assign.var] = q;
+                }
+            }
         }
     }
 
