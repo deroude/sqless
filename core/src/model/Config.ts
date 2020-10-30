@@ -3,10 +3,12 @@ import { MongoConfig } from "./MongoConfig";
 import { Migration } from "./Migration";
 import { DelegateMethodExecutor } from "./Delegate";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
+import { MailConfig } from "./MailConfig";
 
 export interface Config {
     version: string;
     dbConnection?: PostgresConfig | MongoConfig;
+    mail?: MailConfig;
     migrations?: Migration[];
     api?: string | OpenAPIV3.Document;
     delegatePaths?: { [path: string]: { [method: string]: string } }

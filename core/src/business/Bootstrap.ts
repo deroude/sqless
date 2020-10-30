@@ -6,7 +6,7 @@ import * as yaml from 'js-yaml';
 import { PostgresQueryExecutor } from './PostgresQueryExecutor';
 import { Pool } from 'pg';
 import { SQLess } from './SQLess';
-import { QueryDelegateConfig } from '../model/QueryDelegateConfig';
+import { QueryDelegateConfig } from '../model/DelegateConfig';
 import { PostgresDelegate } from './PostgresDelegate';
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 import { MigrationExecutor } from '../model/MigrationExecutor';

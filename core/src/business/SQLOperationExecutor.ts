@@ -1,5 +1,5 @@
 import { QueryExecutor } from "../model/QueryExecutor";
-import { OperationExecutor, SQLOperationConfig } from "../model/QueryDelegateConfig";
+import { OperationExecutor, SQLOperationConfig } from "../model/DelegateConfig";
 import _ from "lodash";
 
 export class SQLOperationExecutor implements OperationExecutor {

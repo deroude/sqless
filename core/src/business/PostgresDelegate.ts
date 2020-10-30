@@ -1,6 +1,6 @@
 import { DelegateMethodExecutor } from '../model/Delegate';
 import { QueryExecutor } from '../model/QueryExecutor';
-import { getExecutor, QueryDelegateConfig } from '../model/QueryDelegateConfig';
+import { getExecutor, QueryDelegateConfig } from '../model/DelegateConfig';
 import _ from 'lodash';
 
 export class PostgresDelegate implements DelegateMethodExecutor {
