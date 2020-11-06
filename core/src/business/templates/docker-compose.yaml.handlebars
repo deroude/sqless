@@ -3,7 +3,7 @@ services:
     db:
         image: postgres
         ports:
-        - "5432:5432"
+            - "5432:5432"
         environment:
             POSTGRES_PASSWORD: postgres
         volumes:
@@ -11,9 +11,11 @@ services:
     keycloak:
         image: jboss/keycloak
         ports:
-        - "8180:8080"
+            - "8180:8080"
         depends_on:
-        - db
+            - db
+        volumes:
+            - ./realm-config.json:/tmp/realm-config.json
         environment:
             DB_VENDOR: postgres
             DB_DATABASE: keycloak
@@ -21,3 +23,7 @@ services:
             DB_PORT: 5432
             DB_USER: keycloak
             DB_PASSWORD: keycloak
+            KEYCLOAK_USER: admin
+            KEYCLOAK_PASSWORD: admin
+            KEYCLOAK_IMPORT: /tmp/realm-config.json
+        

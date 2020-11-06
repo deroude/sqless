@@ -1,0 +1,45 @@
+{
+    "realm": "{{ realmName }}",
+    "enabled": true,
+    "accessTokenLifespan": 60,
+    "accessCodeLifespan": 60,
+    "accessCodeLifespanUserAction": 300,
+    "ssoSessionIdleTimeout": 600,
+    "ssoSessionMaxLifespan": 36000,
+    "sslRequired": "external",
+    "registrationAllowed": false,
+    "privateKey": "{{ privateKey }}",
+    "publicKey": "{{ publicKey }}",
+    "requiredCredentials": [ "password" ],
+    "users" : [],
+    "roles" : {
+        "realm" : [
+{{#each roles}}
+            {
+                "name": "{{ name }}",
+                "description": "{{ description }}"
+            }{{~#unless @last}},{{/unless}}
+{{/each}}
+        ]
+    },
+    "scopeMappings": [
+        {
+            "client": "{{ realmName }}-client",
+            "roles": [{{#each roles}}"{{name}}"{{~#unless @last}},{{/unless}}{{/each}}]
+        }
+    ],
+    "clients": [
+        {
+            "clientId": "{{ realmName }}-client",
+            "enabled": true,
+            "publicClient": true,
+            "baseUrl": "{{ server }}",
+            "redirectUris": [
+                "{{ server }}/*"
+            ],
+            "webOrigins": [
+                "{{ server }}"
+            ]
+        }
+    ]
+}

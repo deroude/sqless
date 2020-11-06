@@ -4,6 +4,8 @@ import * as yaml from 'js-yaml';
 import { GeneratorConfig } from "../model/GeneratorConfig";
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 import Handlebars from 'handlebars';
+import util from 'util';
+import { generateKeyPair } from 'crypto';
 
 global.Handlebars = Handlebars;
 
@@ -12,6 +14,8 @@ Handlebars.registerHelper("inc", (value) => Number(value) + 1);
 import './templates/precompiled';
 
 type PGType = 'serial' | 'varchar' | 'decimal' | 'int' | 'bigint' | 'boolean' | 'timestamptz';
+
+const KEY_PATTERN = /\n|-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|-----BEGIN RSA PRIVATE KEY-----|-----END RSA PRIVATE KEY-----/g;
 
 interface Property {
     name: string;
@@ -205,6 +209,35 @@ export class Generator {
 
         await this.writeFile('.sqless/sqless-config.yaml', Handlebars.templates['sqless-config.yaml'], { apiPath: this.config.apiPath.replace(/^\.[\/\\]/, ''), entities });
 
+        // Security
+
+        if (api.components.securitySchemes && api.components.securitySchemes && Object.keys(api.components.securitySchemes)[0]) {
+            const realmName = Object.keys(api.components.securitySchemes)[0];
+            const { publicKey, privateKey } = await util.promisify(generateKeyPair)('rsa', {
+                modulusLength: 4096,
+                publicKeyEncoding: {
+                    type: 'spki',
+                    format: 'pem'
+                },
+                privateKeyEncoding: {
+                    type: 'pkcs1',
+                    format: 'pem'
+                }
+            });
+            const scopes = (api.components.securitySchemes[realmName] as OpenAPIV3.OAuth2SecurityScheme).flows.implicit.scopes;
+            const roles = Object.keys(scopes).map(k => ({ name: k, description: scopes[k] }));
+            const server = api.servers && api.servers[0] ? api.servers[0].url : '';
+            await this.writeFile('.sqless/realm-config.json', Handlebars.templates['realm-config.json'], {
+                realmName,
+                // publicKey,
+                // privateKey,
+                publicKey: publicKey.replace(KEY_PATTERN, ''),
+                privateKey: privateKey.replace(KEY_PATTERN, ''),
+                roles,
+                server
+            });
+
+        }
 
         return Promise.resolve();
     }
