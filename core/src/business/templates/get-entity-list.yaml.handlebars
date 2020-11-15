@@ -1,5 +1,6 @@
 operations:
   - id: GetList{{ name }}
+    type: sql
     template: >-
       SELECT {{#each properties}}"{{ nameSnake }}"{{~#unless @last}},{{/unless}}{{/each}} 
       FROM "{{ nameSnake }}" ;    

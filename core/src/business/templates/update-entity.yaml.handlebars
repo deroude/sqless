@@ -1,5 +1,6 @@
 operations:
   - id: Update{{ name }}
+    type: sql
     template: >-
       UPDATE "{{ nameSnake }}" SET 
       {{#each properties}}{{#unless isId}}"{{ nameSnake }}" = ${{inc @index}} {{~#unless @last}},{{/unless}}{{/unless}}{{/each}}
